@@ -14,15 +14,15 @@ from datasets import load_dataset
 __all__ = [
     # 'celeba',
     # 'cifar10', 'cifar100',
-    # 'cocodet',
-    'cococap',
+    # 'cococap',
+    'cocodet',
     # 'fmnist', 'mnist',
     # 'imagenet', 'miniimagenet',
     # 'svhn', 'voc',
 ]
 
 __subset__ = [
-    'celeba', 'cocodet', 'cococap', 'imagenet'
+    # 'celeba', 'cocodet', 'cococap', 'imagenet'
 ]
 
 
@@ -245,20 +245,22 @@ def get_loader(dataset, batch_size, train=True,
             params['permutation'] = permutation
         transform = _get_transform(params)
 
-        target_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize((cfg.im_size[dataset], cfg.im_size[dataset])),
-            transforms.Lambda(lambda x: torch.from_numpy(
-                np.array(x).astype(int))),
-        ])
+        # moved the transform logic to the coco.py CocoDet class, _get_index fn
+        # target_transform = transforms.Compose([
+        #     transforms.ToPILImage(),
+        #     transforms.Resize((cfg.im_size[dataset], cfg.im_size[dataset])),
+        #     transforms.Lambda(lambda x: torch.from_numpy(
+        #         np.array(x).astype(int))),
+        # ])
 
         train = 'train' if train else 'val'
         dataset = CocoDet(
             root='{}/coco/{}2014'.format(cfg.data_dir, train),
+            cache_dir=cfg.cache_dir, split=train,
             annFile='{}/coco/annotations/instances_{}2014.json'.format(
                 cfg.data_dir, train),
             transform=transform,
-            target_transform=target_transform,
+            # target_transform=target_transform,
         )
         if subset < 1:
             indices = _get_subset_index(list(range(len(dataset))), subset)
