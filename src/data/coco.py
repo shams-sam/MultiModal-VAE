@@ -12,7 +12,7 @@ from torchvision.datasets import CocoDetection, CocoCaptions
 from tqdm import tqdm
 
 import data.config as cfg
-from data.embedding import BertEmbedding
+from data.embedding import BertEmbedding, FastTextEmbedding
 
 
 class CocoCommon(ABC):
@@ -111,13 +111,16 @@ class CocoDet(CocoDetection, CocoCommon):
 
 
 class CocoCap(CocoCaptions, CocoCommon):
-    def __init__(self, cache_dir, split, **kwargs):
+    def __init__(self, cache_dir, split, lm, **kwargs):
         super(CocoCap, self).__init__(**kwargs)
-        self.embedder = BertEmbedding()
+        if lm == 'bert':
+            self.embedder = BertEmbedding()
+        elif lm == 'ft':  # ft stands for fasttext
+            self.embedder = FastTextEmbedding()
         self.cache_file = cache_dir
         if cache_dir:
             os.makedirs(cache_dir, exist_ok=True)
-            self.cache_file = f'{cache_dir}/coco_cap_{split}.feather'
+            self.cache_file = f'{cache_dir}/coco_cap_{split}_{lm}.feather'
         self._cache = False
         self._make_cache()
 

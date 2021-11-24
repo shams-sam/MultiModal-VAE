@@ -34,3 +34,21 @@ class BertEmbedding:
         token_vecs = hidden_states[-2][0]
 
         return torch.mean(token_vecs, dim=0)
+
+
+class FastTextEmbedding:
+    def __init__(self, seq_len, pad=True):
+        self.ft = fasttext.load_model(f'{data_dir}/FastText/cc.en.300.bin')
+        self.seq_len = seq_len
+
+    def get_embedding(self, text):
+        embed_seq = []
+        for i, word in enumerate(text):
+            embed = self.ft[word]
+            embed_seq.append(embed)
+
+        while i < self.seq_len:
+            embed_seq.append(torch.zeros(300,))
+            i += 1
+
+        return torch.FloatTensor(embed_seq)

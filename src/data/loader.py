@@ -225,7 +225,7 @@ def get_loader(dataset, batch_size, train=True,
         train = 'train' if train else 'val'
         dataset = CocoCap(
             root='{}/coco/{}2014'.format(cfg.data_dir, train),
-            cache_dir=cfg.cache_dir, split=train,
+            cache_dir=cfg.cache_dir, split=train, lm='bert',
             annFile='{}/coco/annotations/captions_{}2014.json'.format(
                 cfg.data_dir, train),
             transform=transform,
